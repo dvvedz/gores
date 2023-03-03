@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/dvvedz/gore/utils"
+	"github.com/dvvedz/gores/utils"
 )
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 
 	// Required flags
 	if *fileFlag == "" {
-		fmt.Println("-file flag is required")
+		fmt.Println("-f flag is required")
 		fmt.Println("")
 		flag.Usage()
 		os.Exit(1)
@@ -72,7 +72,7 @@ func main() {
 		printStdout = true
 	}
 
-	_, cerr := utils.ExecCommand(p, cmd, printStdout, false)
+	_, cerr := utils.ExecCommand(p, cmd, printStdout, true)
 	if cerr != nil {
 		log.Fatalf("%v", cerr)
 	}
