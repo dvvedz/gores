@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
@@ -19,8 +21,6 @@ func main() {
 	cleanFlag := flag.Bool("clean", false, "clean up all files generated from script, after script run")
 
 	flag.Parse()
-
-	// TODO read input from stdin
 
 	// Required flags
 	if *fileFlag == "" {
@@ -45,6 +45,8 @@ func main() {
 
 	rfile = utils.TildeToAbsolutePath(rfile)
 	wfile = utils.TildeToAbsolutePath(wfile)
+
+	updateResolvers(rfile)
 
 	// check if provided file exits
 	if !utils.FileExists(rfile) {
@@ -109,4 +111,19 @@ func fileCleanup() {
 			panic(err)
 		}
 	}
+}
+
+func updateResolvers(filename string) {
+	resp, err := http.Get("https://public-dns.info/nameservers.txt")
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+	defer resp.Body.Close()
+
+	out, ferr := os.Create(filename)
+	if ferr != nil {
+		log.Fatalf("error: %v", ferr)
+	}
+	defer out.Close()
+	io.Copy(out, resp.Body)
 }
